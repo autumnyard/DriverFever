@@ -96,11 +96,12 @@ public class Director : MonoBehaviour
                 //managerCamera.cameras[0].Set( CameraHelper.Type.Follow, managerEntity.playersScript[0].transform );
                 //managerCamera.cameras[0].Set( CameraHelper.Type.FixedAxis, managerEntity.playersScript[0].transform, false, 6f );
                 //managerCamera.cameras[0].Set( CameraHelper.Type.FollowWithOffset, managerEntity.playersScript[0].transform, 0.2f );
-                managerCamera.cameras[0].Set( CameraHelper.Type.FixedAxisWithOffset, managerEntity.playersScript[0].transform, false, offsetValueP:3f );
+                managerCamera.cameras[0].Set( CameraHelper.Type.FixedAxisWithOffset, managerEntity.playersScript[0].transform, false, offsetValueP: 3f );
 
                 if (managerEntity.playersScript[0] != null)
                 {
                     managerEntity.playersScript[0].OnDie += GameEnd;
+                    managerEntity.playersScript[0].OnExitChunk += managerMap.chunkLoader.LoadNextChunk;
                 }
 
                 managerInput.SetEvents();
@@ -108,6 +109,7 @@ public class Director : MonoBehaviour
                 break;
 
             case Structs.GameScene.GameEnd:
+                managerEntity.playersScript[0].OnExitChunk -= managerMap.chunkLoader.LoadNextChunk;
                 managerEntity.playersScript[0].OnDie -= GameEnd;
 
                 managerEntity.Reset();

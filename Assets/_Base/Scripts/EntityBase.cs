@@ -62,7 +62,7 @@ public class EntityBase : MonoBehaviour
     public delegate void Delegate();
     public Delegate OnAppear;
     public Delegate OnDie;
-    public Delegate OnExitMap;
+    public Delegate OnExitChunk;
     public Delegate OnCollideWithEntity;
 
     public delegate void DelegateInt( int newHealth );
@@ -380,17 +380,17 @@ public class EntityBase : MonoBehaviour
 
 
     #region Collision
-    private void OnTriggerExit( Collider col )
+    private void OnTriggerExit2D( Collider2D col )
     {
-        //// For example, when exiting the game zone
-        //if (col.gameObject.CompareTag( "Boundary" ))
-        //{
-        //    //Die();
-        //    if (OnExitMap != null)
-        //    {
-        //        OnExitMap();
-        //    }
-        //}
+        // For example, when exiting the game zone
+        if (col.gameObject.CompareTag( "Chunk" ))
+        {
+            //Die();
+            if (OnExitChunk != null)
+            {
+                OnExitChunk();
+            }
+        }
     }
 
     private void OnCollisionEnter2D( Collision2D collision )
