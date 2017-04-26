@@ -93,8 +93,8 @@ public class Director : MonoBehaviour
                 managerEntity.SummonPlayer( 0, Vector2.zero );
 
                 // Set camera
-                managerCamera.cameras[0].Set( CameraHelper.Type.Follow, managerEntity.playersScript[0].transform );
-                //managerCamera.cameras[0].Set( CameraHelper.Type.FixedAxis, managerEntity.playersScript[0].transform, true, 0f );
+                //managerCamera.cameras[0].Set( CameraHelper.Type.Follow, managerEntity.playersScript[0].transform );
+                managerCamera.cameras[0].Set( CameraHelper.Type.FixedAxis, managerEntity.playersScript[0].transform, false, 0f );
 
                 if (managerEntity.playersScript[0] != null)
                 {

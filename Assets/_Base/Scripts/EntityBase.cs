@@ -37,8 +37,16 @@ public class EntityBase : MonoBehaviour
     private const uint invulnerabilityFrames = 5u;
 
     // Physics
-    //[Header("Physics")]
-    [SerializeField] private float runSpeed = 4f;
+    [Header( "Physics" ), SerializeField]
+    private float acceleration = 4f;
+    [SerializeField] private float dash = 2f;
+    [SerializeField] private float dashAgainTime = 0.5f;
+    private bool canDash = true;
+    Coroutine dashTimerCoroutine;
+    [SerializeField] private float grip = 2f;
+    [SerializeField] private float dragLinear = 1f;
+    [SerializeField] private float dragAngular = 0.05f;
+    [SerializeField] private float rotationForce = 2f;
 
 
     // Tweens
@@ -175,6 +183,10 @@ public class EntityBase : MonoBehaviour
     public void Set( int idP )
     {
         id = idP;
+
+        // Physics
+        rigidbody.drag = dragLinear;
+        rigidbody.angularDrag = dragAngular;
     }
 
     private void SetInvulnerability( bool to )
@@ -211,6 +223,13 @@ public class EntityBase : MonoBehaviour
                 OnHurt( health );
             }
 
+            // You can instantly dash again after being hurt
+            if (dashTimerCoroutine != null)
+            {
+                StopCoroutine( dashTimerCoroutine );
+            }
+            canDash = true;
+
             if (health <= 0)
             {
                 ChangeState( States.Dying );
@@ -242,6 +261,7 @@ public class EntityBase : MonoBehaviour
         //transform.localPosition = Vector2.zero;
         //transform.localPosition = initialPosition;
         rigidbody.velocity = Vector2.zero;
+        canDash = true;
     }
     #endregion
 
@@ -304,24 +324,63 @@ public class EntityBase : MonoBehaviour
 
 
     #region Physics
-    public void MoveUp()
+    private void MoveUp()
     {
-        rigidbody.AddForce( Vector2.up * runSpeed, ForceMode2D.Force );
-    }
-    public void MoveDown()
-    {
-        rigidbody.AddForce( Vector2.down * runSpeed, ForceMode2D.Force );
-    }
-    public void MoveLeft()
-    {
-        rigidbody.AddForce( Vector2.left * runSpeed, ForceMode2D.Force );
-    }
-    public void MoveRight()
-    {
-        rigidbody.AddForce( Vector2.right * runSpeed, ForceMode2D.Force );
+        rigidbody.AddForce( Vector2.up * acceleration, ForceMode2D.Force );
     }
 
-    void OnTriggerExit( Collider col )
+    private void MoveDown()
+    {
+        rigidbody.AddForce( Vector2.down * acceleration, ForceMode2D.Force );
+    }
+
+    private void MoveLeft( float multiplier = 1f, bool relative = false, ForceMode2D mode = ForceMode2D.Force )
+    {
+        Vector2 direction = Vector2.zero;
+        if (relative)
+        {
+            direction = -transform.right;
+        }
+        else
+        {
+            direction = Vector2.left;
+        }
+        rigidbody.AddForce( direction * acceleration, mode );
+    }
+
+    private void MoveRight( float multiplier = 1f, bool relative = false, ForceMode2D mode = ForceMode2D.Force )
+    {
+        Vector2 direction = Vector2.zero;
+        if (relative)
+        {
+            direction = transform.right;
+        }
+        else
+        {
+            direction = Vector2.right;
+        }
+        rigidbody.AddForce( direction * acceleration, mode );
+    }
+
+    private void MoveForward()
+    {
+        rigidbody.AddForce( transform.up * acceleration, ForceMode2D.Force );
+    }
+
+    private void RotateLeft( ForceMode2D mode )
+    {
+        rigidbody.AddTorque( rotationForce, mode );
+    }
+
+    private void RotateRight( ForceMode2D mode )
+    {
+        rigidbody.AddTorque( -rotationForce, mode );
+    }
+    #endregion
+
+
+    #region Collision
+    private void OnTriggerExit( Collider col )
     {
         //// For example, when exiting the game zone
         //if (col.gameObject.CompareTag( "Boundary" ))
@@ -334,7 +393,7 @@ public class EntityBase : MonoBehaviour
         //}
     }
 
-    void OnCollisionEnter2D( Collision2D collision )
+    private void OnCollisionEnter2D( Collision2D collision )
     {
         // For example, when touching another entity
         //if (collision.gameObject.CompareTag( "Player" ))
@@ -344,6 +403,61 @@ public class EntityBase : MonoBehaviour
         //        OnCollideWithEntity();
         //    }
         //}
+    }
+    #endregion
+
+
+    #region Input
+    public void DashLeft()
+    {
+        if (canDash)
+        {
+            MoveLeft( dash, true, ForceMode2D.Impulse );
+            dashTimerCoroutine = StartCoroutine( DashTimer() );
+        }
+    }
+
+    public void DashRight()
+    {
+        if (canDash)
+        {
+            MoveRight( dash, true, ForceMode2D.Impulse );
+            dashTimerCoroutine = StartCoroutine( DashTimer() );
+        }
+    }
+
+    IEnumerator DashTimer()
+    {
+        //yield return new WaitForSeconds( dashTime );
+        //if (currentState == States.Dashing)
+        //{
+        //    ChangeState( States.Normal );
+        //    trail.time = 0.1f;
+        //}
+
+        canDash = false;
+        yield return new WaitForSeconds( dashAgainTime );
+        canDash = true;
+
+        // Tween to show that you can dash again
+        //transform.GetChild( 0 ).DOScale( new Vector3( transform.localScale.x * dashAgainScale, transform.localScale.y * dashAgainScale, transform.localScale.z ), timeAnimationDashAgain )
+        //                  .SetEase( Ease.InOutCubic )
+        //                  .SetLoops( 2, LoopType.Yoyo );
+    }
+
+    public void Accelerate()
+    {
+        MoveForward( );
+    }
+
+    public void RotateLeft()
+    {
+        RotateLeft( ForceMode2D.Force );
+    }
+
+    public void RotateRight()
+    {
+        RotateRight( ForceMode2D.Force );
     }
     #endregion
 }

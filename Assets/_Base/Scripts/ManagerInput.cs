@@ -105,8 +105,8 @@ public class ManagerInput : MonoBehaviour
             CallDelegate( OnKeyboard[(int)MyKeyboard.H], Input.GetKey( KeyCode.H ) );
             CallDelegate( OnKeyboard[(int)MyKeyboard.K], Input.GetKey( KeyCode.K ) );
 
-            CallDelegate( OnKeyboard[(int)MyKeyboard.Q], Input.GetKey( KeyCode.Q ) );
-            CallDelegate( OnKeyboard[(int)MyKeyboard.E], Input.GetKey( KeyCode.E ) );
+            CallDelegate( OnKeyboard[(int)MyKeyboard.Q], Input.GetKeyDown( KeyCode.Q ) );
+            CallDelegate( OnKeyboard[(int)MyKeyboard.E], Input.GetKeyDown( KeyCode.E ) );
 
 
             // Special keys
@@ -211,10 +211,14 @@ public class ManagerInput : MonoBehaviour
             case Structs.GameScene.Ingame:
                 // TODO: Descomentar todo esto!
                 Bind( ref OnKeyboard[(int)MyKeyboard.Escape], Director.Instance.GameEnd );
-                Bind( ref OnKeyboard[(int)MyKeyboard.W], Director.Instance.managerEntity.playersScript[0].MoveUp );
-                Bind( ref OnKeyboard[(int)MyKeyboard.S], Director.Instance.managerEntity.playersScript[0].MoveDown );
-                Bind( ref OnKeyboard[(int)MyKeyboard.A], Director.Instance.managerEntity.playersScript[0].MoveLeft );
-                Bind( ref OnKeyboard[(int)MyKeyboard.D], Director.Instance.managerEntity.playersScript[0].MoveRight );
+                Bind( ref OnKeyboard[(int)MyKeyboard.W], Director.Instance.managerEntity.playersScript[0].Accelerate );
+                //Bind( ref OnKeyboard[(int)MyKeyboard.S], Director.Instance.managerEntity.playersScript[0].MoveDown );
+                Bind( ref OnKeyboard[(int)MyKeyboard.A], Director.Instance.managerEntity.playersScript[0].RotateLeft );
+                Bind( ref OnKeyboard[(int)MyKeyboard.D], Director.Instance.managerEntity.playersScript[0].RotateRight );
+                Bind( ref OnKeyboard[(int)MyKeyboard.Q], Director.Instance.managerEntity.playersScript[0].DashLeft );
+                Bind( ref OnKeyboard[(int)MyKeyboard.ArrowLeft], Director.Instance.managerEntity.playersScript[0].DashLeft );
+                Bind( ref OnKeyboard[(int)MyKeyboard.E], Director.Instance.managerEntity.playersScript[0].DashRight );
+                Bind( ref OnKeyboard[(int)MyKeyboard.ArrowRight], Director.Instance.managerEntity.playersScript[0].DashRight );
                 //Bind(ref OnKeyboard[(int)MyKeyboard.Space], Director.Instance.PlayerJump);
                 //Bind(ref OnKeyboard[(int)MyKeyboard.Enter], Director.Instance.GenerateEnemy);
                 //Bind(ref OnKeyboard[(int)MyKeyboard.ArrowLeft], Director.Instance.MapPrevious);
