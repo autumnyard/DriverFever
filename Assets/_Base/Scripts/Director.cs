@@ -94,7 +94,9 @@ public class Director : MonoBehaviour
 
                 // Set camera
                 //managerCamera.cameras[0].Set( CameraHelper.Type.Follow, managerEntity.playersScript[0].transform );
-                managerCamera.cameras[0].Set( CameraHelper.Type.FixedAxis, managerEntity.playersScript[0].transform, false, 0f );
+                //managerCamera.cameras[0].Set( CameraHelper.Type.FixedAxis, managerEntity.playersScript[0].transform, false, 6f );
+                //managerCamera.cameras[0].Set( CameraHelper.Type.FollowWithOffset, managerEntity.playersScript[0].transform, 0.2f );
+                managerCamera.cameras[0].Set( CameraHelper.Type.FixedAxisWithOffset, managerEntity.playersScript[0].transform, false, offsetValueP:3f );
 
                 if (managerEntity.playersScript[0] != null)
                 {

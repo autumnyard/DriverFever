@@ -11,7 +11,9 @@ public class CameraHelper : MonoBehaviour
         //FixedPoint = 0, // This can be done following a non-moving GameObject
         //SnapToPoints, // This has different FixedPoints, and snaps to the one closer to the player
         FixedAxis,
-        Follow
+        FixedAxisWithOffset,
+        Follow,
+        FollowWithOffset
     }
 
     #region Variables
@@ -24,6 +26,10 @@ public class CameraHelper : MonoBehaviour
     [Header( "Fixed axis" )]
     public bool isHorizontal = true; // True = horizontal. False = vertical
     public float fixedValue = 0f; // If the axis is horizontal, this is the height. If the axis is vertical, this is the X value
+
+    [Header( "With offset" )]
+    public float offsetValue = 0.2f;
+
 
     // Follow type specific variables
 
@@ -51,6 +57,7 @@ public class CameraHelper : MonoBehaviour
         camera = transform;
 
     }
+
     void FixedUpdate()
     {
         if (camera != null)
@@ -63,8 +70,16 @@ public class CameraHelper : MonoBehaviour
                         CameraFixedAxis();
                         break;
 
+                    case Type.FixedAxisWithOffset:
+                        CameraFixedAxisWithOffset();
+                        break;
+
                     case Type.Follow:
                         CameraFollow();
+                        break;
+
+                    case Type.FollowWithOffset:
+                        CameraFollowOffset();
                         break;
 
                 }
@@ -76,6 +91,7 @@ public class CameraHelper : MonoBehaviour
         }
     }
     #endregion
+
 
     #region Options
 
@@ -95,12 +111,54 @@ public class CameraHelper : MonoBehaviour
         }
     }
 
+    private void CameraFixedAxisWithOffset()
+    {
+        Vector3 newPos = Vector3.zero;
+        if (target != null)
+        {
+            float newPosX = (isHorizontal) ? target.localPosition.x + offsetValue : fixedValue;
+            float newPosY = (isHorizontal) ? fixedValue : target.localPosition.y + offsetValue;
+            newPos = new Vector3( newPosX, newPosY, -10 );
+
+            // Apply the offset frontfacing the target direction
+            //Vector3 offset = target.transform.up.normalized * offsetValue;
+            //newPos = newPos + offset;
+            //newPos.z = -10;
+
+            camera.localPosition = newPos;
+        }
+        else
+        {
+            //Debug.LogError( "There's no target in camera " + name );
+        }
+    }
+
     private void CameraFollow()
     {
         Vector3 newPos = Vector3.zero;
         if (target != null)
         {
             newPos = new Vector3( target.localPosition.x, target.localPosition.y, -10 );
+            camera.localPosition = newPos;
+        }
+        else
+        {
+            //Debug.LogError( "There's no target in camera " + name );
+        }
+    }
+
+    private void CameraFollowOffset()
+    {
+        Vector3 newPos = Vector3.zero;
+        if (target != null)
+        {
+            newPos = new Vector3( target.localPosition.x, target.localPosition.y, -10 );
+
+            // Apply the offset frontfacing the target direction
+            Vector3 offset = target.transform.up.normalized * offsetValue;
+            newPos = newPos + offset;
+            newPos.z = -10;
+
             camera.localPosition = newPos;
         }
         else
@@ -124,6 +182,22 @@ public class CameraHelper : MonoBehaviour
         target = targetP;
         isHorizontal = isHorizontalP;
         fixedValue = fixedValueP;
+    }
+
+    public void Set( Type typeP = Type.FixedAxisWithOffset, Transform targetP = null, bool isHorizontalP = false, float fixedValueP = 0f, float offsetValueP = 0.2f )
+    {
+        type = typeP;
+        target = targetP;
+        isHorizontal = isHorizontalP;
+        fixedValue = fixedValueP;
+        offsetValue = offsetValueP;
+    }
+
+    public void Set( Type typeP = Type.FollowWithOffset, Transform targetP = null, float offsetValueP = 0.2f )
+    {
+        type = typeP;
+        target = targetP;
+        offsetValue = offsetValueP;
     }
     #endregion
 }
